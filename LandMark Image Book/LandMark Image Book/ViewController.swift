@@ -14,11 +14,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     var landmarkNamesArray = [String]()
     var landmarkImageArray = [UIImage]()
     
-    
+    var chosenLandmarkName = ""
+    var chosenLandmarkImage = UIImage()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 //tableview setup
+        
         tableView.dataSource = self
         tableView.delegate = self
         
@@ -38,6 +40,35 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return landmarkNamesArray.count
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+//tableView element deletion
+        if editingStyle == .delete {
+            landmarkNamesArray.remove(at: indexPath.row)
+            landmarkImageArray.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: UITableViewRowAnimation.fade)
+        }
+    }
+//segue
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "toImageVCSegue" {
+            let destinationVC = segue.destination as! ImageViewController
+            destinationVC.selectedLandmarkName = chosenLandmarkName
+            destinationVC.selectedLandmarkImage = chosenLandmarkImage
+        }
+        
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        self.chosenLandmarkName = landmarkNamesArray[indexPath.row]
+        self.chosenLandmarkImage = landmarkImageArray[indexPath.row]
+        
+        performSegue(withIdentifier: "toImageVCSegue", sender: nil)
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
